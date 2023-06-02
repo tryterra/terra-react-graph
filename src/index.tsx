@@ -22,8 +22,3 @@ const TerraReactGraphs = NativeModules.TerraReactGraphs
       }
     );
 
-
-
-export function multiply(a: number, b: number): Promise<number> {
-  return TerraReactGraphs.multiply(a, b);
-}
