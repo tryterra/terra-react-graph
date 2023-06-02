@@ -1,5 +1,10 @@
 import { NativeModules, Platform } from 'react-native';
 
+import Graph, { GraphType as g } from './graph';
+
+export const TerraGraph = Graph;
+export type GraphType = g;
+
 const LINKING_ERROR =
   `The package 'react-native-terra-react-graphs' doesn't seem to be linked. Make sure: \n\n` +
   Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
@@ -16,6 +21,8 @@ const TerraReactGraphs = NativeModules.TerraReactGraphs
         },
       }
     );
+
+
 
 export function multiply(a: number, b: number): Promise<number> {
   return TerraReactGraphs.multiply(a, b);
