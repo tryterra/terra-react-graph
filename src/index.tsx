@@ -11,6 +11,7 @@ const LINKING_ERROR =
   '- You rebuilt the app after installing the package\n' +
   '- You are not using Expo Go\n';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TerraReactGraphs = NativeModules.TerraReactGraphs
   ? NativeModules.TerraReactGraphs
   : new Proxy(
@@ -21,4 +22,3 @@ const TerraReactGraphs = NativeModules.TerraReactGraphs
         },
       }
     );
-

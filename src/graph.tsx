@@ -1,10 +1,15 @@
 /* eslint-disable */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { WebView } from 'react-native-webview';
 
-import { Connections, getActivity, getBody, getDaily, getSleep } from 'terra-react';
-import { Text, View } from 'react-native';
+import {
+  Connections,
+  getActivity,
+  getBody,
+  getDaily,
+  getSleep,
+} from 'terra-react';
 
 export type GraphType =
   | 'ACTIVITY_HR_SAMPLES'
@@ -22,54 +27,27 @@ export type GraphType =
   | 'SLEEP_LIGHT_SUMMARY'
   | 'SLEEP_DEEP_SUMMARY'
   | 'SLEEP_REM_LIGHT_DEEP_PIE_SUMMARY';
-
-type DataMessage = {
-  success: Boolean;
-  data: Object;
-  error: String | null;
-};
-
-let htmlString: any;
-
-async function functionMap(graph: GraphType, startDate: string, endDate: string, toWebhook=true, connection: Connections) {
-
+async function functionMap(
+  graph: GraphType,
+  startDate: string,
+  endDate: string,
+  toWebhook = true,
+  connection: Connections
+) {
   let start = new Date(startDate);
   let end = new Date(endDate);
 
   if (graph.includes('ACTIVITY')) {
-     getActivity(connection, start, end, toWebhook).then(r => (r.success) ? r.data : `error: ${r.error}`)
+    return await getActivity(connection, start, end, toWebhook);
+  } else if (graph.includes('BODY')) {
+    return await getBody(connection, start, end, toWebhook);
+  } else if (graph.includes('DAILY')) {
+    return await getDaily(connection, start, end, toWebhook);
+  } else if (graph.includes('SLEEP')) {
+    return await getSleep(connection, start, end, toWebhook);
+  } else {
+    return 'error';
   }
-  else if (graph.includes('BODY')) {
-    getBody(connection, start, end, toWebhook).then(r => (r.success) ? r.data : `error: ${r.error}`)
-  }
-  else if (graph.includes('DAILY')) {
-    return await getDaily(connection, start, end, toWebhook)
-  }
-  else if (graph.includes('SLEEP')) {
-    return await getSleep(connection, start, end, toWebhook)
-  }
-  else{
-    return "custom";
-  }
-}
-
-async function fetchGraph(props: { type: any; token: any; loadingComponent?: JSX.Element | undefined; styles?: React.CSSProperties | undefined; className?: string | undefined; test?: boolean | undefined; startDate: any; endDate: any; displayValueBottom?: boolean | undefined; enableTitle?: boolean | undefined; titleContent?: string | undefined; getImg?: boolean | undefined; getReactNative?: boolean | undefined; toWebhook: any; connections: any; }, bottom: string, enableTitle: string, titleContent: string, getImg: string, getReactNative: string) {
-  var data = await functionMap(props.type, props.startDate, props.endDate, props.toWebhook, props.connections)
-
-  const response = await fetch(`http://127.0.0.1:8080/graphs/render_react?type=${props.type}&token=${
-    props.token}&start_date=${props.startDate}&end_date=${props.endDate}${bottom}${enableTitle}${titleContent}${getImg}${getReactNative}`, {
-    method: 'POST',
-    mode: "no-cors",
-    body: JSON.stringify({
-      data
-    }),
-  })
-
-  console.log(response)
-
-  htmlString = await response.text();
-    console.log(htmlString)
-
 }
 
 function Graph(props: {
@@ -89,20 +67,91 @@ function Graph(props: {
   toWebhook: boolean;
   connections: Connections;
 }) {
-  const [loading, setLoading] = useState(true);
+  const [htmlString, sethtmlString] = useState<string>('<p> hi there </p>');
 
-  let bottom = props.hasOwnProperty('displayValueBottom') ? `&display_value_bottom=${props.displayValueBottom}` : ''
-  let enableTitle = props.hasOwnProperty('enableTitle') ? `&enable_html_title=${props.enableTitle}` : ''
-  let titleContent = props.hasOwnProperty('enableTitle') ? `&enable_html_title=${props.enableTitle}` : ''
-  let getImg = props.hasOwnProperty('getImg') ? `&get_img=${props.getImg}` : ''
-  let getReactNative = props.hasOwnProperty('getReactNative') ? `&get_react_native=${props.getReactNative}` : ''
+  let bottom = props.hasOwnProperty('displayValueBottom')
+    ? `&display_value_bottom=${props.displayValueBottom}`
+    : '';
+  let enableTitle = props.hasOwnProperty('enableTitle')
+    ? `&enable_html_title=${props.enableTitle}`
+    : '';
+  let titleContent = props.hasOwnProperty('enableTitle')
+    ? `&enable_html_title=${props.enableTitle}`
+    : '';
+  let getImg = props.hasOwnProperty('getImg') ? `&get_img=${props.getImg}` : '';
+  let getReactNative = props.hasOwnProperty('getReactNative')
+    ? `&get_react_native=${props.getReactNative}`
+    : '';
 
-  fetchGraph(props, bottom, enableTitle, titleContent, getImg, getReactNative)
+  useEffect(() => {
+    async function fetchGraph(
+      props: {
+        type: any;
+        token: any;
+        loadingComponent?: JSX.Element | undefined;
+        styles?: React.CSSProperties | undefined;
+        className?: string | undefined;
+        test?: boolean | undefined;
+        startDate: any;
+        endDate: any;
+        displayValueBottom?: boolean | undefined;
+        enableTitle?: boolean | undefined;
+        titleContent?: string | undefined;
+        getImg?: boolean | undefined;
+        getReactNative?: boolean | undefined;
+        toWebhook: any;
+        connections: any;
+      },
+      bottom: string,
+      enableTitle: string,
+      titleContent: string,
+      getImg: string,
+      getReactNative: string
+    ) {
+      var data = await functionMap(
+        props.type,
+        props.startDate,
+        props.endDate,
+        props.toWebhook,
+        props.connections
+      );
+      data = JSON.stringify(data.data.data);
+      //console.log(data)
+      console.log('data fetch ');
+
+      const response = await fetch(
+        `http://127.0.0.1:8080/graphs/render_react?type=${props.type}&token=${props.token}&start_date=${props.startDate}&end_date=${props.endDate}${bottom}${enableTitle}${titleContent}${getImg}${getReactNative}`,
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            data,
+          }),
+        }
+      );
+
+      const resp = await response.text();
+      sethtmlString(resp);
+      console.log(resp);
+    }
+
+    fetchGraph(
+      props,
+      bottom,
+      enableTitle,
+      titleContent,
+      getImg,
+      getReactNative
+    );
+  });
 
   return (
-      <Text>asdf</Text>
-    );
-
+    <WebView
+      scalesPageToFit={true}
+      javaScriptEnabled={true}
+      originWhitelist={['*']}
+      source={{ html: `${htmlString}` }}
+    />
+  );
 }
 
 export default Graph;
