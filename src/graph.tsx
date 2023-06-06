@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import React, { useEffect, useState } from 'react';
 import { WebView } from 'react-native-webview';
 
@@ -9,6 +7,8 @@ import {
   getBody,
   getDaily,
   getSleep,
+  initConnection,
+  initTerra,
 } from 'terra-react';
 
 export type GraphType =
@@ -27,6 +27,18 @@ export type GraphType =
   | 'SLEEP_LIGHT_SUMMARY'
   | 'SLEEP_DEEP_SUMMARY'
   | 'SLEEP_REM_LIGHT_DEEP_PIE_SUMMARY';
+
+type DataMessage = {
+  success: Boolean;
+  data: Object;
+  error: String | null;
+};
+
+const funcMapErr: DataMessage = {
+  success: false,
+  data: {},
+  error: 'Graph type not found',
+};
 async function functionMap(
   graph: GraphType,
   startDate: string,
@@ -36,7 +48,6 @@ async function functionMap(
 ) {
   let start = new Date(startDate);
   let end = new Date(endDate);
-
   if (graph.includes('ACTIVITY')) {
     return await getActivity(connection, start, end, toWebhook);
   } else if (graph.includes('BODY')) {
@@ -46,8 +57,22 @@ async function functionMap(
   } else if (graph.includes('SLEEP')) {
     return await getSleep(connection, start, end, toWebhook);
   } else {
-    return 'error';
+    return funcMapErr;
   }
+}
+
+async function inits(
+  SDKToken: string,
+  devID: string,
+  refID: string,
+  connection: Connections,
+  schedulerOn: boolean
+) {
+  var initT = await initTerra(devID, refID);
+  console.log('initTerra: ' + initT.success);
+
+  var initC = await initConnection(connection, SDKToken, schedulerOn);
+  console.log('initConnection: ' + initC.success);
 }
 
 function Graph(props: {
@@ -66,8 +91,16 @@ function Graph(props: {
   getReactNative?: boolean;
   toWebhook: boolean;
   connections: Connections;
+  SDKToken?: string;
+  devID?: string;
+  refID?: string;
+  schedulerOn?: boolean;
 }) {
-  const [htmlString, sethtmlString] = useState<string>('<p> hi there </p>');
+  var dataRetrieved = false;
+
+  const [htmlString, sethtmlString] = useState<string>(
+    '<p> Graph loading... </p>'
+  );
 
   let bottom = props.hasOwnProperty('displayValueBottom')
     ? `&display_value_bottom=${props.displayValueBottom}`
@@ -101,6 +134,10 @@ function Graph(props: {
         getReactNative?: boolean | undefined;
         toWebhook: any;
         connections: any;
+        SDKToken?: string;
+        devID?: string;
+        refID?: string;
+        schedulerOn?: boolean;
       },
       bottom: string,
       enableTitle: string,
@@ -108,16 +145,32 @@ function Graph(props: {
       getImg: string,
       getReactNative: string
     ) {
-      var data = await functionMap(
+      if (
+        props.hasOwnProperty('SDKToken') &&
+        props.hasOwnProperty('devID') &&
+        props.hasOwnProperty('refID') &&
+        props.hasOwnProperty('schedulerOn')
+      ) {
+        await inits(
+          props.SDKToken as string,
+          props.devID as string,
+          props.refID as string,
+          props.connections,
+          props.schedulerOn as boolean
+        );
+      }
+
+      var data: any = await functionMap(
         props.type,
         props.startDate,
         props.endDate,
         props.toWebhook,
         props.connections
       );
-      data = JSON.stringify(data.data.data);
-      //console.log(data)
-      console.log('data fetch ');
+
+      if (data.success) {
+        data = JSON.stringify(data.data.data);
+      }
 
       const response = await fetch(
         `http://127.0.0.1:8080/graphs/render_react?type=${props.type}&token=${props.token}&start_date=${props.startDate}&end_date=${props.endDate}${bottom}${enableTitle}${titleContent}${getImg}${getReactNative}`,
@@ -128,10 +181,10 @@ function Graph(props: {
           }),
         }
       );
-
-      const resp = await response.text();
+      let resp = await response.text();
       sethtmlString(resp);
-      console.log(resp);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      dataRetrieved = true;
     }
 
     fetchGraph(
@@ -142,7 +195,7 @@ function Graph(props: {
       getImg,
       getReactNative
     );
-  });
+  }, [dataRetrieved]);
 
   return (
     <WebView
