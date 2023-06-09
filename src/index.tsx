@@ -1,6 +1,7 @@
 import { NativeModules, Platform } from 'react-native';
 
-import Graph, { GraphType as g } from './graph';
+import Graph from './graph';
+import type { GraphType as g } from './type';
 
 export const TerraGraph = Graph;
 export type GraphType = g;

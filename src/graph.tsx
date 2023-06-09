@@ -9,7 +9,7 @@ import {
   getSleep,
 } from 'terra-react';
 import { View } from 'react-native';
-import type { GraphPropsType, GraphType, TimePeriod } from './type';
+import { GraphPropsType, GraphType, TimePeriod } from './type';
 
 const GraphPeriod = {
   DAY: 0,
@@ -66,7 +66,7 @@ function Graph(props: GraphPropsType) {
   // Determine the start data and end date
   const timePeriodKey: TimePeriod = props.timePeriod
     ? props.timePeriod
-    : 'WEEK';
+    : TimePeriod.WEEK;
   let startTime: Date, endTime: Date;
   if (props.startDate) {
     startTime = new Date(props.startDate);
@@ -79,9 +79,9 @@ function Graph(props: GraphPropsType) {
       );
     }
   } else {
-    startTime = new Date();
-    endTime = new Date(
-      startTime.getTime() + GraphPeriod[timePeriodKey] * 24 * 60 * 60 * 1000
+    endTime = new Date();
+    startTime = new Date(
+      endTime.getTime() - GraphPeriod[timePeriodKey] * 24 * 60 * 60 * 1000
     );
   }
   // params of the Graph API render_SDK request
@@ -101,6 +101,8 @@ function Graph(props: GraphPropsType) {
    * @return  {DataMessage} data itself.
    */
   async function fetchGraph() {
+    console.log(startTime);
+    console.log(endTime);
     const responseData: any = await functionMap(
       props.type,
       startTime,
@@ -112,7 +114,7 @@ function Graph(props: GraphPropsType) {
     if (responseData.success) {
       const data = JSON.stringify(responseData.data.data);
       const response = await fetch(
-        `http://127.0.0.1:8080/graphs/render_SDK?type=${props.type}&token=${props.token}${getImg}${imgWidth}${imgHeight}${getSmallTemplate}`,
+        `https://api.tryterra.co/v2/graphs/render_SDK?type=${props.type}&token=${props.token}${getImg}${imgWidth}${imgHeight}${getSmallTemplate}`,
         {
           method: 'POST',
           body: JSON.stringify({

@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { Connections, getUserId, initConnection, initTerra } from 'terra-react';
 import { TerraGraph } from 'react-native-terra-react-graphs';
+import { GraphType, TimePeriod } from '../../src/type';
+import { Config } from './Config';
 
 async function inits(
   SDKToken: string,
@@ -13,31 +15,36 @@ async function inits(
   schedulerOn: boolean,
   setUserId: React.Dispatch<React.SetStateAction<String | null>>
 ) {
-  var initT = await initTerra(devID, refID);
+  let initT = await initTerra(devID, refID);
   console.log('initTerra: ' + initT.success);
-  var initC = await initConnection(connection, SDKToken, schedulerOn);
+  let initC = await initConnection(connection, SDKToken, schedulerOn);
   console.log('initConnection: ' + initC.success);
   if (initC.success) {
-    var initUseId = await getUserId(connection);
+    let initUseId = await getUserId(connection);
     const user_id = initUseId.userId;
     setUserId(user_id);
     console.log('initUseId: ' + initUseId.userId);
   }
 }
 export default function App() {
-  var start = '2023-06-03';
-  var end = '2023-06-10';
   const [userId, setUserId] = useState<String | null>(null);
   const [graphToken, setGraphToken] = useState('');
   const getSDKTokenAndUserId = async () => {
     try {
-      const response = await fetch(
-        'http://127.0.0.1:8081/auth/generateAuthToken'
-      );
+      // Make this request in the backend instead. This is only for demo purposes.
+      const url = `${Config.ProdUrl}/auth/generateAuthToken`;
+      const headers = {
+        'dev-id': Config.DevID,
+        'x-api-key': Config.APIKEY,
+      };
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: headers,
+      });
       const SDKJson = await response.json();
       await inits(
         SDKJson.token,
-        'testingJeffrey',
+        Config.DevID,
         '1',
         Connections.APPLE_HEALTH,
         true,
@@ -49,9 +56,16 @@ export default function App() {
   };
   const getGraphToken = async () => {
     try {
-      const responseGraphToken = await fetch(
-        `http://127.0.0.1:8081/graphs/token?user_id=${userId}`
-      );
+      // Make this request in the backend instead. This is only for demo purposes.
+      const url = `${Config.ProdUrl}graphs/token?user_id=${userId}`;
+      const headers = {
+        'dev-id': Config.DevID,
+        'x-api-key': Config.APIKEY,
+      };
+      const responseGraphToken = await fetch(url, {
+        method: 'GET',
+        headers: headers,
+      });
       const GraphJson = await responseGraphToken.json();
       setGraphToken(GraphJson.token);
     } catch (error) {
@@ -75,12 +89,11 @@ export default function App() {
     <View style={styles.container}>
       <View style={styles.box}>
         <TerraGraph
-          type={'SLEEP_REM_SUMMARY'}
+          type={GraphType.SLEEP_REM_SUMMARY}
           styles={{ flex: 1, justifyContent: 'center' }}
           loadingComponent={<ActivityIndicator />}
           token={graphToken}
-          startDate={start}
-          endDate={end}
+          timePeriod={TimePeriod.WEEK}
           toWebhook={false}
           connections={Connections.APPLE_HEALTH}
         />
