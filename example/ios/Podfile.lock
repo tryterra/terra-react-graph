@@ -473,7 +473,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - react-native-terra-react-graphs (from `../..`)
-  - react-native-webview (from `../../node_modules/react-native-webview`)
+  - react-native-webview (from `../node_modules/react-native-webview`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -553,7 +553,7 @@ EXTERNAL SOURCES:
   react-native-terra-react-graphs:
     :path: "../.."
   react-native-webview:
-    :path: "../../node_modules/react-native-webview"
+    :path: "../node_modules/react-native-webview"
   React-perflogger:
     :path: "../node_modules/react-native/ReactCommon/reactperflogger"
   React-RCTActionSheet:
@@ -642,4 +642,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: bf4523345b620497a72e7892f2b353d78f3a318a
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.12.0

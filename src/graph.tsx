@@ -1,37 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { WebView } from 'react-native-webview';
-
 import {
   Connections,
+  DataMessage,
   getActivity,
   getBody,
   getDaily,
   getSleep,
-  initConnection,
-  initTerra,
 } from 'terra-react';
+import { View } from 'react-native';
+import type { GraphPropsType, GraphType, TimePeriod } from './type';
 
-export type GraphType =
-  | 'ACTIVITY_HR_SAMPLES'
-  | 'ACTIVITY_POWER_SAMPLES'
-  | 'BODY_GLUCOSE_SUMMARY'
-  | 'BODY_GLUCOSE_AGP'
-  | 'DAILY_STEPS_SUMMARY'
-  | 'DAILY_RHR_SUMMARY'
-  | 'SLEEP_HR_SUMMARY'
-  | 'SLEEP_HRV_SUMMARY'
-  | 'SLEEP_ASLEEP_SUMMARY'
-  | 'SLEEP_RHR_SUMMARY'
-  | 'SLEEP_RESPIRATORY_RATE_SUMMARY'
-  | 'SLEEP_REM_SUMMARY'
-  | 'SLEEP_LIGHT_SUMMARY'
-  | 'SLEEP_DEEP_SUMMARY'
-  | 'SLEEP_REM_LIGHT_DEEP_PIE_SUMMARY';
-
-type DataMessage = {
-  success: Boolean;
-  data: Object;
-  error: String | null;
+const GraphPeriod = {
+  DAY: 0,
+  WEEK: 7,
+  TWO_WEEK: 14,
+  MONTH: 30,
+  THREE_MONTHS: 90,
+  HALF_YEAR: 160,
+  YEAR: 365,
 };
 
 const funcMapErr: DataMessage = {
@@ -39,141 +26,93 @@ const funcMapErr: DataMessage = {
   data: {},
   error: 'Graph type not found',
 };
+
+/**
+ * A function to retrieve data from the device
+ * @param   {GraphType} graph the Graph type
+ * @param   {string} startDate start date of the graph
+ * @param   {string} endDate end date of the graph
+ * @param   {boolean} toWebhook data send to webhook or not
+ * @param   {Connections} connection Connections
+ * @return  {DataMessage} data itself.
+ */
 async function functionMap(
   graph: GraphType,
-  startDate: string,
-  endDate: string,
-  toWebhook = true,
+  start: Date,
+  end: Date,
+  toWebhook = false,
   connection: Connections
 ) {
-  let start = new Date(startDate);
-  let end = new Date(endDate);
-  if (graph.includes('ACTIVITY')) {
-    return await getActivity(connection, start, end, toWebhook);
-  } else if (graph.includes('BODY')) {
-    return await getBody(connection, start, end, toWebhook);
-  } else if (graph.includes('DAILY')) {
-    return await getDaily(connection, start, end, toWebhook);
-  } else if (graph.includes('SLEEP')) {
-    return await getSleep(connection, start, end, toWebhook);
-  } else {
-    return funcMapErr;
+  const prefix = graph.split('_')[0]; // Extract the prefix from the graph
+  switch (prefix) {
+    case 'ACTIVITY':
+      return await getActivity(connection, start, end, toWebhook);
+    case 'BODY':
+      return await getBody(connection, start, end, toWebhook);
+    case 'DAILY':
+      return await getDaily(connection, start, end, toWebhook);
+    case 'SLEEP':
+      return await getSleep(connection, start, end, toWebhook);
+    default:
+      return funcMapErr;
   }
 }
 
-async function inits(
-  SDKToken: string,
-  devID: string,
-  refID: string,
-  connection: Connections,
-  schedulerOn: boolean
-) {
-  var initT = await initTerra(devID, refID);
-  console.log('initTerra: ' + initT.success);
-
-  var initC = await initConnection(connection, SDKToken, schedulerOn);
-  console.log('initConnection: ' + initC.success);
-}
-
-function Graph(props: {
-  type: GraphType;
-  token: string;
-  loadingComponent?: JSX.Element;
-  styles?: React.CSSProperties;
-  className?: string;
-  test?: boolean;
-  startDate: string;
-  endDate: string;
-  displayValueBottom?: boolean;
-  enableTitle?: boolean;
-  titleContent?: string;
-  getImg?: boolean;
-  getReactNative?: boolean;
-  toWebhook: boolean;
-  connections: Connections;
-  SDKToken?: string;
-  devID?: string;
-  refID?: string;
-  schedulerOn?: boolean;
-}) {
-  var dataRetrieved = false;
-
-  const [htmlString, sethtmlString] = useState<string>(
+function Graph(props: GraphPropsType) {
+  const [loading, setLoading] = useState(true);
+  const [htmlString, setHtmlString] = useState<string>(
     '<p> Graph loading... </p>'
   );
-
-  let bottom = props.hasOwnProperty('displayValueBottom')
-    ? `&display_value_bottom=${props.displayValueBottom}`
-    : '';
-  let enableTitle = props.hasOwnProperty('enableTitle')
-    ? `&enable_html_title=${props.enableTitle}`
-    : '';
-  let titleContent = props.hasOwnProperty('enableTitle')
-    ? `&enable_html_title=${props.enableTitle}`
-    : '';
-  let getImg = props.hasOwnProperty('getImg') ? `&get_img=${props.getImg}` : '';
-  let getReactNative = props.hasOwnProperty('getReactNative')
-    ? `&get_react_native=${props.getReactNative}`
-    : '';
-
-  useEffect(() => {
-    async function fetchGraph(
-      props: {
-        type: any;
-        token: any;
-        loadingComponent?: JSX.Element | undefined;
-        styles?: React.CSSProperties | undefined;
-        className?: string | undefined;
-        test?: boolean | undefined;
-        startDate: any;
-        endDate: any;
-        displayValueBottom?: boolean | undefined;
-        enableTitle?: boolean | undefined;
-        titleContent?: string | undefined;
-        getImg?: boolean | undefined;
-        getReactNative?: boolean | undefined;
-        toWebhook: any;
-        connections: any;
-        SDKToken?: string;
-        devID?: string;
-        refID?: string;
-        schedulerOn?: boolean;
-      },
-      bottom: string,
-      enableTitle: string,
-      titleContent: string,
-      getImg: string,
-      getReactNative: string
-    ) {
-      if (
-        props.hasOwnProperty('SDKToken') &&
-        props.hasOwnProperty('devID') &&
-        props.hasOwnProperty('refID') &&
-        props.hasOwnProperty('schedulerOn')
-      ) {
-        await inits(
-          props.SDKToken as string,
-          props.devID as string,
-          props.refID as string,
-          props.connections,
-          props.schedulerOn as boolean
-        );
-      }
-
-      var data: any = await functionMap(
-        props.type,
-        props.startDate,
-        props.endDate,
-        props.toWebhook,
-        props.connections
+  // Determine the start data and end date
+  const timePeriodKey: TimePeriod = props.timePeriod
+    ? props.timePeriod
+    : 'WEEK';
+  let startTime: Date, endTime: Date;
+  if (props.startDate) {
+    startTime = new Date(props.startDate);
+    if (props.endDate) {
+      endTime = new Date(props.endDate);
+    } else {
+      endTime = new Date(
+        new Date(props.startDate).getTime() +
+          GraphPeriod[timePeriodKey] * 24 * 60 * 60 * 1000
       );
+    }
+  } else {
+    startTime = new Date();
+    endTime = new Date(
+      startTime.getTime() + GraphPeriod[timePeriodKey] * 24 * 60 * 60 * 1000
+    );
+  }
+  // params of the Graph API render_SDK request
+  const getImg = props.getImg ? `&get_img=${props.getImg}` : '';
+  const imgWidth = props.imgWidth ? `&get_img=${props.imgWidth}` : '';
+  const imgHeight = props.imgHeight ? `&get_img=${props.imgHeight}` : '';
+  const getSmallTemplate = props.getSmallTemplate
+    ? `&get_small_template=${props.getSmallTemplate}`
+    : '';
+  /**
+   * A function to retrieve data from the device
+   * @param   {GraphType} graph the Graph type
+   * @param   {string} startDate start date of the graph
+   * @param   {string} endDate end date of the graph
+   * @param   {boolean} toWebhook data send to webhook or not
+   * @param   {Connections} connection Connections
+   * @return  {DataMessage} data itself.
+   */
+  async function fetchGraph() {
+    const responseData: any = await functionMap(
+      props.type,
+      startTime,
+      endTime,
+      props.toWebhook,
+      props.connections
+    );
 
-      if (data.success) {
-        data = JSON.stringify(data.data.data);
-      }
-
+    if (responseData.success) {
+      const data = JSON.stringify(responseData.data.data);
       const response = await fetch(
-        `http://127.0.0.1:8080/graphs/render_react?type=${props.type}&token=${props.token}&start_date=${props.startDate}&end_date=${props.endDate}${bottom}${enableTitle}${titleContent}${getImg}${getReactNative}`,
+        `http://127.0.0.1:8080/graphs/render_SDK?type=${props.type}&token=${props.token}${getImg}${imgWidth}${imgHeight}${getSmallTemplate}`,
         {
           method: 'POST',
           body: JSON.stringify({
@@ -182,28 +121,25 @@ function Graph(props: {
         }
       );
       let resp = await response.text();
-      sethtmlString(resp);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      dataRetrieved = true;
+      setHtmlString(resp);
+      setLoading(false);
     }
-
-    fetchGraph(
-      props,
-      bottom,
-      enableTitle,
-      titleContent,
-      getImg,
-      getReactNative
-    );
-  }, [dataRetrieved]);
+  }
+  useEffect(() => {
+    fetchGraph();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props]);
 
   return (
-    <WebView
-      scalesPageToFit={true}
-      javaScriptEnabled={true}
-      originWhitelist={['*']}
-      source={{ html: `${htmlString}` }}
-    />
+    <View style={props.styles}>
+      {loading && props.loadingComponent}
+      <WebView
+        scalesPageToFit={true}
+        javaScriptEnabled={true}
+        originWhitelist={['*']}
+        source={{ html: `${htmlString}` }}
+      />
+    </View>
   );
 }
 
