@@ -84,14 +84,17 @@ export default function App() {
     setGraphToken('');
     getSDKTokenAndUserId();
   }, []);
-
+  const start = '2023-06-08';
+  const end = '2023-06-09';
   return (
     <View style={styles.container}>
       <View style={styles.box}>
         <TerraGraph
-          type={GraphType.SLEEP_REM_SUMMARY}
+          type={GraphType.DAILY_RHR_SUMMARY}
           styles={{ flex: 1, justifyContent: 'center' }}
           loadingComponent={<ActivityIndicator />}
+          startDate={start}
+          endDate={end}
           token={graphToken}
           timePeriod={TimePeriod.WEEK}
           toWebhook={false}

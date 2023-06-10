@@ -2,7 +2,6 @@ import type { ViewStyle } from 'react-native';
 import type { Connections } from 'terra-react';
 
 export enum GraphType {
-  ACTIVITY_HR_SAMPLE = 'ACTIVITY_HR_SAMPLE',
   ACTIVITY_HR_SAMPLES = 'ACTIVITY_HR_SAMPLES',
   ACTIVITY_POWER_SAMPLES = 'ACTIVITY_POWER_SAMPLES',
   BODY_GLUCOSE_SUMMARY = 'BODY_GLUCOSE_SUMMARY',

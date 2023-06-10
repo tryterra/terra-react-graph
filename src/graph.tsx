@@ -101,8 +101,7 @@ function Graph(props: GraphPropsType) {
    * @return  {DataMessage} data itself.
    */
   async function fetchGraph() {
-    console.log(startTime);
-    console.log(endTime);
+    if (props.token === undefined || props.token == '') return;
     const responseData: any = await functionMap(
       props.type,
       startTime,
@@ -112,14 +111,15 @@ function Graph(props: GraphPropsType) {
     );
 
     if (responseData.success) {
-      const data = JSON.stringify(responseData.data.data);
+      const data = JSON.stringify({ data: responseData.data.data });
       const response = await fetch(
         `https://api.tryterra.co/v2/graphs/render_SDK?type=${props.type}&token=${props.token}${getImg}${imgWidth}${imgHeight}${getSmallTemplate}`,
         {
           method: 'POST',
-          body: JSON.stringify({
-            data,
-          }),
+          body: data,
+          headers: {
+            'Content-Type': 'application/json',
+          },
         }
       );
       let resp = await response.text();
@@ -134,13 +134,16 @@ function Graph(props: GraphPropsType) {
 
   return (
     <View style={props.styles}>
-      {loading && props.loadingComponent}
-      <WebView
-        scalesPageToFit={true}
-        javaScriptEnabled={true}
-        originWhitelist={['*']}
-        source={{ html: `${htmlString}` }}
-      />
+      {loading ? (
+        props.loadingComponent
+      ) : (
+        <WebView
+          scalesPageToFit={true}
+          javaScriptEnabled={true}
+          originWhitelist={['*']}
+          source={{ html: `${htmlString}` }}
+        />
+      )}
     </View>
   );
 }
