@@ -22,7 +22,7 @@ export enum GraphType {
 export enum TimePeriod {
   DAY = 'DAY',
   WEEK = 'WEEK',
-  TWO_WEEK = 'TWO_WEEK',
+  TWO_WEEKS = 'TWO_WEEKS',
   MONTH = 'MONTH',
   THREE_MONTHS = 'THREE_MONTHS',
   HALF_YEAR = 'HALF_YEAR',

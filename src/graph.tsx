@@ -14,7 +14,7 @@ import { GraphPropsType, GraphType, TimePeriod } from './type';
 const GraphPeriod = {
   DAY: 0,
   WEEK: 7,
-  TWO_WEEK: 14,
+  TWO_WEEKS: 14,
   MONTH: 30,
   THREE_MONTHS: 90,
   HALF_YEAR: 160,
