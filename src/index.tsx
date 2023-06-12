@@ -1,11 +1,18 @@
 import { NativeModules, Platform } from 'react-native';
 
+import Graph from './graph';
+import type { GraphType as g } from './type';
+
+export const TerraGraph = Graph;
+export type GraphType = g;
+
 const LINKING_ERROR =
   `The package 'react-native-terra-react-graphs' doesn't seem to be linked. Make sure: \n\n` +
   Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
   '- You rebuilt the app after installing the package\n' +
   '- You are not using Expo Go\n';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TerraReactGraphs = NativeModules.TerraReactGraphs
   ? NativeModules.TerraReactGraphs
   : new Proxy(
@@ -16,7 +23,3 @@ const TerraReactGraphs = NativeModules.TerraReactGraphs
         },
       }
     );
-
-export function multiply(a: number, b: number): Promise<number> {
-  return TerraReactGraphs.multiply(a, b);
-}
