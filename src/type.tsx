@@ -32,9 +32,8 @@ export enum TimePeriod {
 export type GraphPropsType = {
   type: GraphType;
   token: string;
-  loadingComponent?: JSX.Element;
   styles?: ViewStyle;
-  className?: string;
+  loadingComponent?: JSX.Element;
   test?: boolean;
   startDate?: string;
   endDate?: string;
@@ -45,8 +44,4 @@ export type GraphPropsType = {
   getSmallTemplate?: boolean;
   toWebhook: boolean;
   connections: Connections;
-  SDKToken?: string;
-  devID?: string;
-  refID?: string;
-  schedulerOn?: boolean;
 };
