@@ -1,5 +1,6 @@
 import Graph from './graph';
-import type { GraphType as g } from './type';
+import { GraphType as g, TimePeriod as t } from './type';
 
 export const TerraGraph = Graph;
-export type GraphType = g;
+export const GraphType = g;
+export const TimePeriod = t;

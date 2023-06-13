@@ -3,8 +3,11 @@ import { useEffect, useState } from 'react';
 
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { Connections, getUserId, initConnection, initTerra } from 'terra-react';
-import { TerraGraph } from 'react-native-terra-react-graphs';
-import { GraphType, TimePeriod } from '../../src/type';
+import {
+  TerraGraph,
+  GraphType,
+  TimePeriod,
+} from 'react-native-terra-react-graphs';
 import { Config } from './Config';
 
 async function inits(
