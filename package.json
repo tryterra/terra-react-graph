@@ -1,7 +1,7 @@
 {
   "name": "react-native-terra-react-graphs",
-  "version": "0.1.0",
-  "description": "test",
+  "version": "0.1.2",
+  "description": "Terra SDK support for Graph API",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
   "types": "lib/typescript/index.d.ts",
@@ -78,7 +78,9 @@
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-webview": "^12.2.0",
+    "terra-react": "^1.4.12"
   },
   "engines": {
     "node": ">= 16.0.0"
