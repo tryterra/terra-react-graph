@@ -1,6 +1,6 @@
 {
   "name": "react-native-terra-react-graphs",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Terra SDK support for Graph API",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
