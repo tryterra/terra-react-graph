@@ -93,7 +93,7 @@ export default function App() {
     <View style={styles.container}>
       <View style={styles.box}>
         <TerraGraph
-          type={GraphType.DAILY_RHR_SUMMARY}
+          type={GraphType.ACTIVITY_HR_SAMPLES}
           styles={{ flex: 1, justifyContent: 'center' }}
           loadingComponent={<ActivityIndicator />}
           startDate={start}
@@ -101,6 +101,14 @@ export default function App() {
           token={graphToken}
           timePeriod={TimePeriod.WEEK}
           toWebhook={false}
+          bgColor={'02327A'}
+          lineColor={'05FFFA'}
+          textColor={'8975FA'}
+          enableHeader={true}
+          htmlTitleContent={'my title'}
+          enableHtmlTimePeriod={true}
+          htmlTimePeriodContent={'my title timeperid'}
+          enableFooter={true}
           connections={Connections.APPLE_HEALTH}
         />
       </View>
@@ -115,6 +123,6 @@ const styles = StyleSheet.create({
     top: '5%',
   },
   box: {
-    height: '40%',
+    height: '50%',
   },
 });

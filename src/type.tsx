@@ -44,4 +44,26 @@ export type GraphPropsType = {
   getSmallTemplate?: boolean;
   toWebhook: boolean;
   connections: Connections;
+  // Adding customisation back
+  bgColor?: string;
+  textColor?: string;
+  chartType?: string;
+  unselectedColor?: string;
+  lineColor?: string;
+  yMin?: bigint;
+  yMax?: bigint;
+  indicator1Y?: bigint;
+  indicator2Y?: bigint;
+  legend?: boolean;
+  title?: string;
+  font?: string;
+  enableHeader?: boolean;
+  enableHtmlTimePeriod?: boolean;
+  colorPanelList?: string;
+  colorHoverPanelList?: string;
+  labelFontSize?: bigint;
+  enableFooter?: boolean;
+  htmlTitleContent?: string;
+  htmlTimePeriodContent?: string;
+  enableYAxisUnit?: boolean;
 };
