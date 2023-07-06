@@ -85,9 +85,10 @@ function Graph(props: GraphPropsType) {
     );
   }
   // params of the Graph API render_SDK request
+  const test = props.test ? `&test=${props.test}`: '';
   const getImg = props.getImg ? `&get_img=${props.getImg}` : '';
-  const imgWidth = props.imgWidth ? `&get_img=${props.imgWidth}` : '';
-  const imgHeight = props.imgHeight ? `&get_img=${props.imgHeight}` : '';
+  const imgWidth = props.imgWidth ? `&imgWidth=${props.imgWidth}` : '';
+  const imgHeight = props.imgHeight ? `&imgHeight=${props.imgHeight}` : '';
   const getSmallTemplate = props.getSmallTemplate
     ? `&get_small_template=${props.getSmallTemplate}`
     : '';
