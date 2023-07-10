@@ -33,6 +33,7 @@ export type GraphPropsType = {
   type: GraphType;
   token: string;
   styles?: ViewStyle;
+  webViewStyles?: ViewStyle;
   loadingComponent?: JSX.Element;
   test?: boolean;
   startDate?: string;

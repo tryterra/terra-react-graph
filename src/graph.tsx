@@ -183,6 +183,7 @@ function Graph(props: GraphPropsType) {
         props.loadingComponent
       ) : (
         <WebView
+          style={props.webViewStyles}
           scalesPageToFit={true}
           javaScriptEnabled={true}
           originWhitelist={['*']}
