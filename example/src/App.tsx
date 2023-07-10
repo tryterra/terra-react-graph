@@ -95,6 +95,7 @@ export default function App() {
         <TerraGraph
           type={GraphType.ACTIVITY_HR_SAMPLES}
           styles={{ flex: 1, justifyContent: 'center' }}
+          webViewStyles={{ backgroundColor: 'transparent' }}
           loadingComponent={<ActivityIndicator />}
           startDate={start}
           endDate={end}
@@ -121,6 +122,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     top: '5%',
+    backgroundColor: '#8cc3f3',
   },
   box: {
     height: '50%',
