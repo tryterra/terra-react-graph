@@ -85,9 +85,10 @@ function Graph(props: GraphPropsType) {
     );
   }
   // params of the Graph API render_SDK request
+  const test = props.test ? `&test=${props.test}` : '';
   const getImg = props.getImg ? `&get_img=${props.getImg}` : '';
-  const imgWidth = props.imgWidth ? `&get_img=${props.imgWidth}` : '';
-  const imgHeight = props.imgHeight ? `&get_img=${props.imgHeight}` : '';
+  const imgWidth = props.imgWidth ? `&img_width=${props.imgWidth}` : '';
+  const imgHeight = props.imgHeight ? `&img_height=${props.imgHeight}` : '';
   const getSmallTemplate = props.getSmallTemplate
     ? `&get_small_template=${props.getSmallTemplate}`
     : '';
@@ -157,7 +158,7 @@ function Graph(props: GraphPropsType) {
     if (responseData.success) {
       const data = JSON.stringify({ data: responseData.data.data });
       const response = await fetch(
-        `https://api.tryterra.co/v2/graphs/render_sdk?type=${props.type}&token=${props.token}${getImg}${imgWidth}${imgHeight}${getSmallTemplate}${bgColor}${textColor}${chartType}${unselectedColor}${lineColor}${yMin}${yMax}${indicator1Y}${indicator2Y}${title}${legend}${colorPanelList}${colorHoverPanelList}${labelFontSize}${font}${enableHeader}${enableHtmlTimePeriod}${enableFooter}${htmlTitleContent}${enableYAxisUnit}${htmlTimePeriodContent}`,
+        `https://api.tryterra.co/v2/graphs/render_sdk?type=${props.type}&token=${props.token}${test}${getImg}${imgWidth}${imgHeight}${getSmallTemplate}${bgColor}${textColor}${chartType}${unselectedColor}${lineColor}${yMin}${yMax}${indicator1Y}${indicator2Y}${title}${legend}${colorPanelList}${colorHoverPanelList}${labelFontSize}${font}${enableHeader}${enableHtmlTimePeriod}${enableFooter}${htmlTitleContent}${enableYAxisUnit}${htmlTimePeriodContent}`,
         {
           method: 'POST',
           body: data,
