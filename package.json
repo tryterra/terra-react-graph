@@ -160,7 +160,7 @@
     ]
   },
   "dependencies": {
-    "terra-react": "^1.4.12",
+    "terra-react": "^1.4.16",
     "react-native-webview": "^11.26.1"
   }
 }
