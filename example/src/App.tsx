@@ -20,14 +20,18 @@ async function inits(
 ) {
   let initT = await initTerra(devID, refID);
   console.log('initTerra: ' + initT.success);
-  let initC = await initConnection(connection, SDKToken, schedulerOn);
-  console.log('initConnection: ' + initC.success);
-  if (initC.success) {
-    let initUseId = await getUserId(connection);
-    const user_id = initUseId.userId;
-    setUserId(user_id);
-    console.log('initUseId: ' + initUseId.userId);
+  let initUseId = await getUserId(connection);
+
+  // only need to create a new connection if there is currently no user
+  if (initUseId.userId == null) {
+    let initC = await initConnection(connection, SDKToken, schedulerOn);
+    console.log('initConnection: ' + initC.success);
+    initUseId = await getUserId(connection);
   }
+
+  const user_id = initUseId.userId;
+  setUserId(user_id);
+  console.log('initUseId: ' + initUseId.userId);
 }
 export default function App() {
   const [userId, setUserId] = useState<String | null>(null);
@@ -88,19 +92,18 @@ export default function App() {
     getSDKTokenAndUserId();
   }, []);
   const start = '2023-06-08';
-  const end = '2023-06-09';
+  const end = '2023-06-23';
   return (
     <View style={styles.container}>
       <View style={styles.box}>
         <TerraGraph
-          type={GraphType.ACTIVITY_HR_SAMPLES}
+          type={GraphType.DAILY_STEPS_SUMMARY}
           styles={{ flex: 1, justifyContent: 'center' }}
-          webViewStyles={{ backgroundColor: 'transparent' }}
           loadingComponent={<ActivityIndicator />}
           startDate={start}
           endDate={end}
           token={graphToken}
-          timePeriod={TimePeriod.WEEK}
+          timePeriod={TimePeriod.DAY}
           toWebhook={false}
           bgColor={'02327A'}
           lineColor={'05FFFA'}
@@ -122,7 +125,6 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     top: '5%',
-    backgroundColor: '#8cc3f3',
   },
   box: {
     height: '50%',
